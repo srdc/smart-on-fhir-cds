@@ -10,7 +10,7 @@ The server can be easily integrated with [HL7 FHIR](https://www.hl7.org/fhir/) s
 In this example, some risk prediction services are implemented such as QRISK and SCORE. The services also provides some
 recommendations based on NICE guidelines to lower the predicted risks.
 
-You can check the following [project](https://github.com/bunyaminsg/smart-apps) to see the GUIs for these services implemented by [Angular](https://angular.io).
+You can check the following [project](https://github.com/srdc/smart-on-fhir-web-apps.git) to see the GUIs for these services implemented by [Angular](https://angular.io).
 
 ## Features
 
@@ -21,7 +21,7 @@ You can check the following [project](https://github.com/bunyaminsg/smart-apps) 
 ## Build and Run
 
 ```bash
-git clone https://github.com/bunyaminsg/smart-cds.git
+git clone https://github.com/srdc/smart-on-fhir-cds.git
 cd smart-cds
 mvn package
 java -jar target/smart-cds.jar
@@ -248,6 +248,16 @@ Response:
         }
     ]
 }
+```
+
+## Docker
+
+You can create and run a docker image as following:
+
+```
+mvn clean install
+docker build -t srdc/smart-cds -f ./docker/Dockerfile .
+docker compose -f ./docker/docker-compose.yml up -d
 ```
 
 ## Disclaimer
