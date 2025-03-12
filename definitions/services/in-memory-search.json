@@ -1,0 +1,9 @@
+{
+  "hook": "query",
+  "title": "Execute in memory query in the given bundle",
+  "description": "",
+  "id": "in-memory-search",
+  "prefetch": {
+    "bundle": "Bundle/input"
+  }
+}

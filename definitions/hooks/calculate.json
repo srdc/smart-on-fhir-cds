@@ -6,6 +6,18 @@
       "prefetchToken": true,
       "type": "string",
       "description": "The FHIR Patient.id of the current patient in context"
+    },
+    "shl": {
+      "isOptional": true,
+      "prefetchToken": false,
+      "type": "string",
+      "description": "Smart Health Link to retrieve data"
+    },
+    "shc": {
+      "isOptional": true,
+      "prefetchToken": false,
+      "type": "array",
+      "description": "An array of Smart Health Cards to parse data"
     }
   }
 }

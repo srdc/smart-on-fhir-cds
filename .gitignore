@@ -26,3 +26,4 @@ logs/
 
 ### Docker Specific ###
 data
+/onFHIRRepository.emb.mongo/

@@ -1,0 +1,11 @@
+{
+  "id": "query",
+  "fields": {
+    "query": {
+      "isOptional": false,
+      "prefetchToken": false,
+      "type": "string",
+      "description": "Query to execute on the resources"
+    }
+  }
+}

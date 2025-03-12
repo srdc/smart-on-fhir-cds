@@ -1,7 +1,8 @@
 package srdc.smartcds.util
 
+import io.onfhir.cds.config.CdsConfig.formats
 import io.onfhir.path.FhirPathEvaluator
-import org.json4s.JNothing
+import org.json4s.{JNothing, JValue}
 
 import java.time.{LocalDate, Period, ZonedDateTime}
 
@@ -152,6 +153,48 @@ object CdsPrefetchUtil {
       val localDate = dob.get.asInstanceOf[ZonedDateTime].toLocalDate
       Option(Period.between(localDate, LocalDate.now()).getYears)
     }
+  }
+
+  /**
+   * Parses url into ResourceType, ID and search parameters
+   * @param url
+   * @return
+   */
+  final def parseUrlSegment(url: String): (String, Option[String], Option[Seq[(String, List[String])]]) = {
+    val readRegex = """^([^/?]+)/([^/?]+)$""".r
+    val searchRegex = """^([^/?]+)\?(.*)$""".r
+    url match {
+      case readRegex(resourceType, id) =>
+        (resourceType, Some(id), None) // Read operation (e.g., "Patient/123")
+      case searchRegex(resourceType, queryString) =>
+        val queryPairs = queryString.split("&").flatMap { param =>
+          param.split("=") match {
+            case Array(key, value) => Some(key -> List(value))
+            case _ => None
+          }
+        }
+        (resourceType, None, Some(queryPairs)) // Search operation (e.g., "Condition?code=123")
+      case _ =>
+        (null, None, None)
+    }
+  }
+
+  /**
+   * Replaces context parameters in the given tuple
+   * @param param
+   * @param contextParams
+   * @return
+   */
+  final def replaceContextParams(param: (String, List[String]), contextParams: Map[String, JValue]): (String, List[String]) = {
+    (param._1 -> param._2.map(value => {
+      var _value = value
+      for (contextParam <- contextParams) {
+        if (_value.contains(s"{{context.${contextParam._1}}}")) {
+          _value = _value.replaceAll(s"\\{\\{context.${contextParam._1}}}", contextParam._2.extract[String])
+        }
+      }
+      _value
+    }))
   }
 
 }

@@ -9,10 +9,11 @@ import srdc.smartcds.util.{CdsPrefetchUtil, ConceptIdUtil}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class QRiskService(cdsServiceContext: CdsServiceContext) extends BaseCdsService(cdsServiceContext) {
+class QRiskService(cdsServiceContext: CdsServiceContext) extends SHCBaseService(cdsServiceContext) {
   implicit val formats: DefaultFormats.type = DefaultFormats
+  override def serviceId: String = "qrisk"
 
-  override def executeCds(cdsServiceRequest: CdsServiceRequest)(implicit ex: ExecutionContext): Future[CdsResponse] = {
+  override def executeCdsWithParsedSHCRequest(cdsServiceRequest: CdsServiceRequest)(implicit ex: ExecutionContext): Future[CdsResponse] = {
     val fhirPathEvaluator = getFhirPathEvaluator(cdsServiceRequest)
     val responseBuilder = createResponse(cdsServiceRequest)
 

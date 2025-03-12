@@ -1,0 +1,7 @@
+{
+  "hook": "definition",
+  "title": "ValueSet of concepts used in the service",
+  "description": "",
+  "id": "valueset",
+  "prefetch": {}
+}

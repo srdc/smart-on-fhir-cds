@@ -7,11 +7,11 @@
     "tag": [
       {
         "code": "custom",
-        "system": "https://fhir.moph.gov.qa/CodeSystem/value-set-type"
+        "system": "https://kroniq.srdc.com.tr/CodeSystem/value-set-type"
       }
     ]
   },
-  "url": "https://fhir.moph.gov.qa/ValueSet/ethnicity",
+  "url": "https://kroniq.srdc.com.tr/ValueSet/ethnicity",
   "name": "vs-ethnicity",
   "status": "active",
   "date": "2024-02-27T08:10:53.537Z",
