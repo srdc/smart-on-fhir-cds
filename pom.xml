@@ -15,23 +15,24 @@
         <maven.compiler.target>11</maven.compiler.target>
 
         <!-- plugin versions -->
-        <scala.maven.plugin.version>3.4.1</scala.maven.plugin.version>
+        <scala.maven.plugin.version>4.8.1</scala.maven.plugin.version>
         <jar.plugin.version>3.1.0</jar.plugin.version>
         <onejar.plugin.version>1.4.4</onejar.plugin.version>
         <surefire.plugin.version>2.19.1</surefire.plugin.version>
         <spotify.docker.plugin.version>0.4.3</spotify.docker.plugin.version>
-        <jackson.version>2.9.6</jackson.version>
+        <jackson.version>2.16.1</jackson.version>
 
         <!-- dependency versions -->
-        <scala.version>2.12.8</scala.version>
-        <scala.binary.version>2.12</scala.binary.version>
+        <scala.version>2.13.10</scala.version>
+        <scala.binary.version>2.13</scala.binary.version>
         <specs2.version>4.10.5</specs2.version>
         <logback.logstash.encoder.version>5.3</logback.logstash.encoder.version>
-        <onfhir.version>3.2-SNAPSHOT</onfhir.version>
+        <onfhir.version>3.4-SNAPSHOT</onfhir.version>
         <akka-http.version>10.2.0</akka-http.version>
         <akka.version>2.6.8</akka.version>
-        <json4s.version>4.0.3</json4s.version>
+        <json4s.version>3.7.0-M11</json4s.version>
         <nimbus.version>9.31</nimbus.version>
+        <scalate.version>1.9.7</scalate.version>
 
     </properties>
 
@@ -46,6 +47,7 @@
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>${scala.maven.plugin.version}</version>
                 <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
                     <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
                     <args>
                         <arg>-deprecation</arg>
@@ -158,31 +160,48 @@
             <version>${scala.version}</version>
         </dependency>
 
-        <!-- FHIR repository-->
-        <dependency>
-            <groupId>io.onfhir</groupId>
-            <artifactId>onfhir-server-r4</artifactId>
-            <version>${onfhir.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.onfhir</groupId>
-            <artifactId>onfhir-common</artifactId>
-            <version>${onfhir.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.onfhir</groupId>
-            <artifactId>onfhir-core</artifactId>
-            <version>${onfhir.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.onfhir</groupId>
-            <artifactId>onfhir-operations</artifactId>
-            <version>${onfhir.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.onfhir</groupId>
             <artifactId>onfhir-cds</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- FHIR repository-->
+        <dependency>
+            <groupId>io.onfhir</groupId>
+            <artifactId>onfhir-server-r4_${scala.binary.version}</artifactId>
+            <version>${onfhir.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.onfhir</groupId>
+            <artifactId>onfhir-common_${scala.binary.version}</artifactId>
+            <version>${onfhir.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.onfhir</groupId>
+            <artifactId>onfhir-core_${scala.binary.version}</artifactId>
+            <version>${onfhir.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.onfhir</groupId>
+            <artifactId>onfhir-r4_${scala.binary.version}</artifactId>
+            <version>${onfhir.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.onfhir</groupId>
+            <artifactId>onfhir-path_${scala.binary.version}</artifactId>
+            <version>${onfhir.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.onfhir</groupId>
+            <artifactId>onfhir-operations_${scala.binary.version}</artifactId>
+            <version>${onfhir.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalatra.scalate</groupId>
+            <artifactId>scalate-core_${scala.binary.version}</artifactId>
+            <version>${scalate.version}</version>
         </dependency>
 
         <dependency>
@@ -210,7 +229,7 @@
 
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_2.12</artifactId>
+            <artifactId>jackson-module-scala_2.13</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
@@ -222,7 +241,13 @@
 
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-native_2.12</artifactId>
+            <artifactId>json4s-native_2.13</artifactId>
+            <version>${json4s.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_2.13</artifactId>
             <version>${json4s.version}</version>
         </dependency>
 
@@ -249,13 +274,13 @@
         <!-- Unit Testing -->
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2-core_2.12</artifactId>
+            <artifactId>specs2-core_2.13</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.specs2</groupId>
-            <artifactId>specs2-junit_2.12</artifactId>
+            <artifactId>specs2-junit_2.13</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

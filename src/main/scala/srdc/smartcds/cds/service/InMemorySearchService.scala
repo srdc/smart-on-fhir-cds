@@ -8,6 +8,7 @@ import io.onfhir.cds.service.{BaseCdsService, CdsServiceContext, CdsServiceReque
 import io.onfhir.util.JsonFormatter.convertToJson2
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JArray, JObject}
+import srdc.smartcds.config.SmartCdsConfig
 import srdc.smartcds.util.CdsPrefetchUtil
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,6 +17,8 @@ import scala.util.Try
 class InMemorySearchService(cdsServiceContext: CdsServiceContext) extends BaseCdsService(cdsServiceContext) {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
+  private val resourceChecker = new ResourceChecker(SmartCdsConfig.fhirServerConfig.get)
+  private val searchParameterValueParser = new FHIRSearchParameterValueParser(SmartCdsConfig.fhirServerConfig.get)
   /**
    * @param cdsServiceRequest Request should include the ID of the requested service
    * @param ex
@@ -33,13 +36,13 @@ class InMemorySearchService(cdsServiceContext: CdsServiceContext) extends BaseCd
         val (resourceType, id, queryParams) = CdsPrefetchUtil.parseUrlSegment(query)
         val params = queryParams.get.filter(param => param._1 != "_count" && param._1 != "_sort")
           .map(CdsPrefetchUtil.replaceContextParams(_, cdsServiceRequest.contextParams)).toMap
-        val parsedSearchParams = FHIRSearchParameterValueParser.parseSearchParameters(resourceType, params).filter(_.paramType != "reference")
+        val parsedSearchParams = searchParameterValueParser.parseSearchParameters(resourceType, params).filter(_.paramType != "reference")
         val entries = Try((bundle \ "entry").extract[List[JObject]]).toOption.getOrElse(List.empty)
         val resultEntries = entries.filter(entry =>
           Try((entry \ "resource" \ "resourceType").extract[String]).toOption.contains(resourceType)
         ).filter(entry => {
-          val resource = Try((entry \ "resource").extract[Resource]).toOption.getOrElse(JObject())
-          ResourceChecker.checkIfResourceSatisfies(resourceType, parsedSearchParams, resource)
+          val resource = Try((entry \ "resource").extract[Resource]).toOption.getOrElse(JObject().asInstanceOf[Resource])
+          resourceChecker.checkIfResourceSatisfies(resourceType, parsedSearchParams, resource)
         })
         responseBuilder.withCard(_.loadCardWithPostTranslation("card-info",
           "bundle" -> s"""{ "resourceType": "Bundle", "entry": ${JArray(resultEntries).toJson} }"""

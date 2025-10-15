@@ -15,6 +15,9 @@ import scala.util.Try
 
 abstract class SHCBaseService(cdsServiceContext: CdsServiceContext) extends BaseCdsService(cdsServiceContext) {
 
+  protected val resourceChecker = new ResourceChecker(SmartCdsConfig.fhirServerConfig.get)
+  protected val searchParameterValueParser = new FHIRSearchParameterValueParser(SmartCdsConfig.fhirServerConfig.get)
+
   /**
    * Id of the service to be overridden in the extending class
    * Used to determine required prefetches
@@ -45,12 +48,12 @@ abstract class SHCBaseService(cdsServiceContext: CdsServiceContext) extends Base
             } else if (queryParams.nonEmpty) {
               val params = queryParams.get.filter(param => param._1 != "_count" && param._1 != "_sort")
                 .map(CdsPrefetchUtil.replaceContextParams(_, cdsServiceRequest.contextParams)).toMap
-              val parsedSearchParams = FHIRSearchParameterValueParser.parseSearchParameters(resourceType, params).filter(_.paramType != "reference")
+              val parsedSearchParams = searchParameterValueParser.parseSearchParameters(resourceType, params).filter(_.paramType != "reference")
               println(key, parsedSearchParams)
               resources.filter(resource =>
                 Try((resource \ "resourceType").extract[String]).toOption.contains(resourceType)
               ).filter(resource => {
-                ResourceChecker.checkIfResourceSatisfies(resourceType, parsedSearchParams, resource.extract[Resource])
+                resourceChecker.checkIfResourceSatisfies(resourceType, parsedSearchParams, resource.extract[Resource])
               }).toSeq
             } else {
               resources.toSeq

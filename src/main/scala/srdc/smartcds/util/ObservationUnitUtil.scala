@@ -62,10 +62,10 @@ object ObservationUnitUtil {
     if (quantity.unit.isDefined && quantity.value.isDefined) {
       val unit = quantity.unit.get
       if (unit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MG_DL)) {
-        quantity.value = Option(BigDecimal(quantity.value.get * 38.67).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get * 38.67).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       } else if (unit.equalsIgnoreCase(ObservationUnitEnum.MG_DL) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L)) {
-        quantity.value = Option(BigDecimal(quantity.value.get / 38.67).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get / 38.67).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       }
     }
@@ -85,10 +85,10 @@ object ObservationUnitUtil {
     if (quantity.unit.isDefined && quantity.value.isDefined) {
       val unit = quantity.unit.get
       if (unit.equalsIgnoreCase(ObservationUnitEnum.MMOL_MOL) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.PERCENT)) {
-        quantity.value = Option(BigDecimal(quantity.value.get * 0.09148 + 2.152).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get * 0.09148 + 2.152).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       } else if (unit.equalsIgnoreCase(ObservationUnitEnum.PERCENT) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MMOL_MOL)) {
-        quantity.value = Option(BigDecimal((quantity.value.get - 2.152) / 0.09148).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal((quantity.value.get - 2.152) / 0.09148).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       }
     }
@@ -108,10 +108,10 @@ object ObservationUnitUtil {
     if (quantity.unit.isDefined && quantity.value.isDefined) {
       val unit = quantity.unit.get
       if (unit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MG_DL)) {
-        quantity.value = Option(BigDecimal(quantity.value.get / 0.0555).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get / 0.0555).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       } else if (unit.equalsIgnoreCase(ObservationUnitEnum.MG_DL) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L)) {
-        quantity.value = Option(BigDecimal(quantity.value.get * 0.0555).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get * 0.0555).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       }
     }
@@ -131,10 +131,10 @@ object ObservationUnitUtil {
     if (quantity.unit.isDefined && quantity.value.isDefined) {
       val unit = quantity.unit.get
       if (unit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MG_DL)) {
-        quantity.value = Option(BigDecimal(quantity.value.get * 88.57).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get * 88.57).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       } else if (unit.equalsIgnoreCase(ObservationUnitEnum.MG_DL) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L)) {
-        quantity.value = Option(BigDecimal(quantity.value.get / 88.57).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get / 88.57).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       }
     }
@@ -160,25 +160,25 @@ object ObservationUnitUtil {
         case ObservationUnitEnum.MG_G =>
           targetUnit.toLowerCase(Locale.ENGLISH) match {
             case ObservationUnitEnum.MG_MMOL =>
-              quantity.value = Option(BigDecimal(quantity.value.get * 0.113).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+              quantity.value = Option(BigDecimal(quantity.value.get * 0.113).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
               quantity.unit = Option(targetUnit)
             case ObservationUnitEnum.MG_MG =>
-              quantity.value = Option(BigDecimal(quantity.value.get * 1000).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+              quantity.value = Option(BigDecimal(quantity.value.get * 1000).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
               quantity.unit = Option(targetUnit)
             case ObservationUnitEnum.UG_UMOL =>
-              quantity.value = Option(BigDecimal(quantity.value.get / 8.85).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+              quantity.value = Option(BigDecimal(quantity.value.get / 8.85).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
               quantity.unit = Option(targetUnit)
           }
         case ObservationUnitEnum.MG_MG =>
-          quantity.value = Option(BigDecimal(quantity.value.get / 1000).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+          quantity.value = Option(BigDecimal(quantity.value.get / 1000).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
           quantity.unit = Option(ObservationUnitEnum.MG_G)
           handleACRUnit(quantity, targetUnit)
         case ObservationUnitEnum.MG_MMOL =>
-          quantity.value = Option(BigDecimal(quantity.value.get / 0.113).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+          quantity.value = Option(BigDecimal(quantity.value.get / 0.113).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
           quantity.unit = Option(ObservationUnitEnum.MG_G)
           handleACRUnit(quantity, targetUnit)
         case ObservationUnitEnum.UG_UMOL =>
-          quantity.value = Option(BigDecimal(quantity.value.get * 8.85).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+          quantity.value = Option(BigDecimal(quantity.value.get * 8.85).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
           quantity.unit = Option(ObservationUnitEnum.MG_G)
           handleACRUnit(quantity, targetUnit)
       }
@@ -199,10 +199,10 @@ object ObservationUnitUtil {
     if (quantity.unit.isDefined && quantity.value.isDefined) {
       val unit = quantity.unit.get
       if (unit.equalsIgnoreCase(ObservationUnitEnum.UMOL_L) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MG_DL)) {
-        quantity.value = Option(BigDecimal(quantity.value.get / 88.4).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get / 88.4).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       } else if (unit.equalsIgnoreCase(ObservationUnitEnum.MG_DL) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.UMOL_L)) {
-        quantity.value = Option(BigDecimal(quantity.value.get * 88.4).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get * 88.4).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       }
     }
@@ -222,10 +222,10 @@ object ObservationUnitUtil {
     if (quantity.unit.isDefined && quantity.value.isDefined) {
       val unit = quantity.unit.get
       if (unit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MG_DL)) {
-        quantity.value = Option(BigDecimal(quantity.value.get / 0.08840).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get / 0.08840).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       } else if (unit.equalsIgnoreCase(ObservationUnitEnum.MG_DL) && targetUnit.equalsIgnoreCase(ObservationUnitEnum.MMOL_L)) {
-        quantity.value = Option(BigDecimal(quantity.value.get * 0.08840).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue())
+        quantity.value = Option(BigDecimal(quantity.value.get * 0.08840).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue)
         quantity.unit = Option(targetUnit)
       }
     }
