@@ -78,7 +78,7 @@ object ValueSetUtil {
    */
   def getConceptSystemCodeAndDisplay(conceptId: String, lang: String): List[(String, String, String)] = {
     try {
-      if (conceptMap.apply(conceptId) != null) {
+      if (conceptMap.contains(conceptId)) {
         conceptMap.apply(conceptId).map(coding => (coding._1, coding._2, coding._3.getOrElse(lang, "")))
       } else {
         List(("","", ""))
