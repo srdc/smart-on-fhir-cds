@@ -1,0 +1,64 @@
+{{!
+  Template: card-disease-risk.mustache
+  Card for individual disease risk with FHIR Observation suggestion
+}}
+{
+"summary": "{{diseaseName}} - Risk: {{riskProbability}}%",
+"indicator": "warning",
+"detail": "Risk for {{diseaseName}}: {{riskProbability}}%. Key contributing factors: {{shapDetails}}",
+"source": {
+"label": ""
+},
+"suggestions": [
+{
+"label": "Record {{diseaseName}} risk assessment",
+"actions": [
+{
+"type": "create",
+"description": "Create FHIR Observation for {{diseaseName}} risk prediction",
+"resource": {
+"resourceType": "Observation",
+"id": "risk-{{diseaseCode}}",
+"status": "final",
+"category": [
+{
+"coding": [
+{
+"system": "http://terminology.hl7.org/CodeSystem/observation-category",
+"code": "laboratory",
+"display": "Laboratory"
+}
+]
+}
+],
+"code": {
+"coding": [
+{
+"system": "http://loinc.org",
+"code": "82810-3",
+"display": "Disease risk score"
+}
+],
+"text": "{{diseaseName}} Risk Prediction"
+},
+"subject": {
+"reference": "Patient/{{patientId}}"
+},
+"effectiveDateTime": "{{effectiveDate}}",
+"valueQuantity": {
+"value": {{riskProbability}},
+"unit": "%",
+"system": "http://unitsofmeasure.org",
+"code": "%"
+},
+"note": [
+{
+"text": "ML-predicted 10-year risk. Key factors: {{shapDetails}}"
+}
+]
+}
+}
+]
+}
+]
+}

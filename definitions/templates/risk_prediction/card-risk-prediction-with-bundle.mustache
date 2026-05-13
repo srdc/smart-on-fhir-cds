@@ -1,0 +1,24 @@
+{{!
+  Template: card-risk-prediction-with-bundle.mustache
+  Main summary card with FHIR Observation Bundle in suggestion
+}}
+{
+"summary": "Risk Assessment Overall Score: {{overallRiskScore}}%",
+"indicator": "info",
+"detail": "Analyzed {{diseaseCount}} conditions using {{featuresMapped}}/{{totalFeatures}} features. Top risks: {{topRisks}}",
+"source": {
+"label": "ML Disease Prediction Service"
+},
+"suggestions": [
+{
+"label": "",
+"actions": [
+{
+"type": "create",
+"description": "",
+"resource": {{{observationBundle}}}
+}
+]
+}
+]
+}

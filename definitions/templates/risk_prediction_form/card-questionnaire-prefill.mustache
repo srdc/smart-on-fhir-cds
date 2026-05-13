@@ -1,0 +1,25 @@
+{{!
+  Template: card-questionnaire-prefill.mustache
+  Card for pre-filled questionnaire response
+}}
+{
+"summary": "Questionnaire pre-filled with any feature found on the system",
+"indicator": "info",
+"detail": "Available fields (if any) have been automatically filled from your health records using UK Biobank mappings.",
+"source": {
+"label": "UK Biobank Pre-fill Service"
+},
+"suggestions": [
+{
+"label": "Use pre-filled questionnaire",
+"isRecommended": true,
+"actions": [
+{
+"type": "create",
+"description": "Pre-filled QuestionnaireResponse with items from UK Biobank data",
+"resource": {{{prefilledQR}}}
+}
+]
+}
+]
+}

@@ -31,4 +31,7 @@ object SmartCdsConfig {
   final val shcEnabled: Boolean = Try(config.getBoolean("app.smart-health-cards.enabled")).getOrElse(false)
   final val shcStrictSignatureVerification: Boolean = Try(config.getBoolean("app.smart-health-cards.signature-verification")).getOrElse(false)
 
+  lazy val sbpCodes = Try(SmartCdsConfig.config.getStringList("onfhir.cds.services.risk_prediction_form.SystolicBP")).toOption
+  lazy val dbpCodes = Try(SmartCdsConfig.config.getStringList("onfhir.cds.services.risk_prediction_form.DiastolicBP")).toOption
+
 }

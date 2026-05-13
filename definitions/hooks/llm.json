@@ -1,0 +1,41 @@
+{
+  "id": "llm",
+  "fields": {
+    "patientId": {
+      "isOptional": false,
+      "prefetchToken": true,
+      "type": "string",
+      "description": "The FHIR Patient.id of the current patient in context"
+    },
+    "sessionId": {
+      "isOptional": true,
+      "prefetchToken": true,
+      "type": "string",
+      "description": "ID of the LLM Chat Session"
+    },
+    "disease": {
+      "isOptional": true,
+      "prefetchToken": false,
+      "type": "string",
+      "description": "Related disease of the user question"
+    },
+    "chartType": {
+      "isOptional": true,
+      "prefetchToken": false,
+      "type": "string",
+      "description": "SHAP chart type (beeswarm, waterfall, etc.)"
+    },
+    "question": {
+      "isOptional": true,
+      "prefetchToken": false,
+      "type": "string",
+      "description": "User question"
+    },
+    "riskPredictions": {
+      "isOptional": true,
+      "prefetchToken": false,
+      "type": "object",
+      "description": "Local plot prediction response"
+    }
+  }
+}

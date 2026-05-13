@@ -1,0 +1,11 @@
+{
+  "hook": "execute",
+  "title": "Risk Prediction service",
+  "description": "",
+  "id": "risk_prediction",
+  "prefetch": {
+    "patient": "Patient/{{context.patientId}}",
+    "qr": "QuestionnaireResponse/{{context.qrId}}",
+    "observations":  "Observation?subject=Patient/{{context.patientId}}"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "hook": "llm",
+  "title": "SHAP Explanation Service",
+  "description": "",
+  "id": "shap_explain",
+  "prefetch": {
+    "patient": "Patient/{{context.patientId}}",
+    "risk_predictions": "Observation?patient=Patient/{{context.patientId}}&code={{config.RISK_PREDICTION_CODE}}"
+  }
+}

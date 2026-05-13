@@ -1,0 +1,9 @@
+{
+  "hook": "llm",
+  "title": "LLM Chat Service",
+  "description": "",
+  "id": "ask_llm",
+  "prefetch": {
+    "patient": "Patient/{{context.patientId}}"
+  }
+}

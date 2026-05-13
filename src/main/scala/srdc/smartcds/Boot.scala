@@ -3,7 +3,7 @@ import io.onfhir.cds.OnFhirCds
 import io.onfhir.config.FSConfigReader
 import io.onfhir.r4.config.FhirR4Configurator
 import srdc.smartcds.cds.CdsServiceFactory
-import srdc.smartcds.config.SmartCdsConfig
+import srdc.smartcds.config.{LlmConfig, SmartCdsConfig}
 
 object Boot extends App {
   // Initialize FHIR version for the in-memory search

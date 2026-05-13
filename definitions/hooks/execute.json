@@ -1,0 +1,17 @@
+{
+  "id": "execute",
+  "fields": {
+    "patientId": {
+      "isOptional": false,
+      "prefetchToken": true,
+      "type": "string",
+      "description": "The FHIR Patient.id of the current patient in context"
+    },
+    "qrId": {
+      "isOptional": true,
+      "prefetchToken": true,
+      "type": "string",
+      "description": "The FHIR qr.id of the current questionnaire in context"
+    }
+  }
+}

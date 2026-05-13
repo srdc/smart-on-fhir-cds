@@ -1,0 +1,25 @@
+{{!
+  Template: card-questionnaire-prefill.mustache
+  Card for pre-filled questionnaire response
+}}
+{
+"summary": "{{#itemCount}}Questionnaire pre-filled with {{itemCount}} items{{/itemCount}}{{^itemCount}}No data available for pre-fill{{/itemCount}}",
+"indicator": "{{#itemCount}}info{{/itemCount}}{{^itemCount}}warning{{/itemCount}}",
+"detail": "{{#itemCount}}{{itemCount}} fields have been automatically filled from your health records using UK Biobank mappings.{{/itemCount}}{{^itemCount}}No matching observations found in your health record. Please fill out the questionnaire manually.{{/itemCount}}",
+"source": {
+"label": "UK Biobank Pre-fill Service"
+},
+"suggestions": [
+{
+"label": "Use pre-filled questionnaire",
+"isRecommended": true,
+"actions": [
+{
+"type": "create",
+"description": "{{#itemCount}}Pre-filled QuestionnaireResponse with {{itemCount}} items from UK Biobank data{{/itemCount}}{{^itemCount}}Empty QuestionnaireResponse{{/itemCount}}",
+"resource": {{{prefilledQR}}}
+}
+]
+}
+]
+}

@@ -1,11 +1,11 @@
 package srdc.smartcds.model.fhir
 
 case class Item(linkId: String,
-                prefix: Option[String],
-                text: Option[String],
-                `type`: Option[String],
-                required: Option[Boolean],
-                item: Option[Array[Item]],
-                answerOption: Option[Array[AnswerOption]],
-                answer: Option[Array[Answer]],
-                code: Option[Array[Coding]])
+                prefix: Option[String] = None,
+                text: Option[String] = None,
+                `type`: Option[String] = None,
+                required: Option[Boolean] = None,
+                item: Option[Array[Item]] = None,
+                answerOption: Option[Array[AnswerOption]] = None,
+                answer: Option[Array[Answer]] = None,
+                code: Option[Array[Coding]] = None)
