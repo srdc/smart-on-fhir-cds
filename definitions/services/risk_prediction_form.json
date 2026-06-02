@@ -16,7 +16,7 @@
     "diastolic_blood_pressure": "Observation?patient=Patient/{{context.patientId}}&code={{config.DiastolicBP}}&category=vital-signs&_sort=-date",
     "systolic_blood_pressure": "Observation?patient=Patient/{{context.patientId}}&code={{config.SystolicBP}}&category=vital-signs&_sort=-date",
     "blood_pressure_panel": "Observation?patient=Patient/{{context.patientId}}&code={{config.BPPanel}}&category=vital-signs&_sort=-date",
-    "waist_circumference": "Observation?patient=Patient/{{context.patientId}}&code={{config.WaistCircumference}}&category=laboratory&_sort=-date",
+    "waist_circumference": "Observation?patient=Patient/{{context.patientId}}&code={{config.WaistCircumference}}&_sort=-date",
     "hip_circumference": "Observation?patient=Patient/{{context.patientId}}&code={{config.HipCircumference}}&category=vital-signs&_sort=-date",
     "body_fat": "Observation?patient=Patient/{{context.patientId}}&code={{config.BodyFat}}&category=vital-signs&_sort=-date",
     "crp": "Observation?patient=Patient/{{context.patientId}}&code={{config.CRP}}&category=laboratory&_sort=-date",
