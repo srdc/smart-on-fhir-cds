@@ -41,7 +41,7 @@ object RiskPredictionFormFlowExecution {
               ldl: Option[Observation], sleepDuration: Option[Observation], routineEvents: Option[Observation],
               smokingStatus: Option[Observation], alcoholIntake: Option[Observation], mood: Seq[Observation],
               mouthUlcer: Boolean, gumPain: Boolean, bleedingGums: Boolean, looseTeeth: Boolean, toothache: Boolean,
-              dentures: Boolean, fracturedBones: Option[Condition], hearingLoss: Boolean,
+              dentures: Boolean, fracturedBones: Option[Observation], hearingLoss: Boolean,
               deafness: Boolean, pain: Boolean, painAllOverBody: Boolean, motherIllnesses1: Boolean, motherIllnesses2: Boolean,
               siblingIllnesses1: Boolean)(implicit system: ActorSystem, ec: ExecutionContext): Future[CdsResponse] = {
     import UKBiobankFeatures._
@@ -98,7 +98,7 @@ object RiskPredictionFormFlowExecution {
                   }).filter(_.nonEmpty).map(_.get.toString)
                   codeAnswers(item, codes)
                 case FRACTURED_BONES =>
-                  if (fracturedBones.exists(condition => condition.onsetDateTime.exists(dt => Period.between(LocalDate.parse(dt), LocalDate.now()).getYears <= 5)))
+                  if (fracturedBones.exists(obs => obs.effectiveDateTime.exists(dt => Period.between(LocalDate.parse(dt.take(10)), LocalDate.now()).getYears <= 5)))
                     codeAnswers(item, Seq("1"))
                   else None
                 case HEARING_DIFFICULTY =>

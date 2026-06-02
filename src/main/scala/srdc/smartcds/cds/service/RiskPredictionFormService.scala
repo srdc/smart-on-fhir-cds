@@ -62,7 +62,7 @@ class RiskPredictionFormService(cdsServiceContext: CdsServiceContext)
     val looseTeeth = cdsServiceRequest.getSearchPrefetch("loose_teeth").nonEmpty
     val toothache = cdsServiceRequest.getSearchPrefetch("toothache").nonEmpty
     val dentures = cdsServiceRequest.getSearchPrefetch("dentures").nonEmpty
-    val fracturedBones = cdsServiceRequest.getSearchPrefetch("fractured_bones").headOption.map(_.extract[Condition])
+    val fracturedBones = cdsServiceRequest.getSearchPrefetch("fractured_bones").headOption.map(_.extract[Observation])
     val hearingLoss = cdsServiceRequest.getSearchPrefetch("hearing_loss").nonEmpty
     val deafness = cdsServiceRequest.getSearchPrefetch("deafness").nonEmpty
     val pain = cdsServiceRequest.getSearchPrefetch("pain").nonEmpty

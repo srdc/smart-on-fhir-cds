@@ -36,7 +36,7 @@
     "loose_teeth": "Condition?patient=Patient/{{context.patientId}}&code={{config.LooseTeeth}}&_sort=-onset-date",
     "toothache": "Condition?patient=Patient/{{context.patientId}}&code={{config.Toothache}}&_sort=-onset-date",
     "dentures": "Condition?patient=Patient/{{context.patientId}}&code={{config.Dentures}}&_sort=-onset-date",
-    "fractured_bones": "Condition?patient=Patient/{{context.patientId}}&code={{config.FracturedBones}}&_sort=-onset-date",
+    "fractured_bones": "Observation?patient=Patient/{{context.patientId}}&code={{config.FracturedBones}}&_sort=-date",
     "hearing_loss": "Condition?patient=Patient/{{context.patientId}}&code={{config.HearingLoss}}&_sort=-onset-date",
     "deafness": "Condition?patient=Patient/{{context.patientId}}&code={{config.Deafness}}&_sort=-onset-date",
     "pain": "Condition?patient=Patient/{{context.patientId}}&code={{config.Pain}}&_sort=-onset-date",
