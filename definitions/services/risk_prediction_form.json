@@ -6,10 +6,10 @@
   "prefetch": {
     "patient": "Patient/{{context.patientId}}",
     "questionnaire": "Questionnaire?code={{config.StageUKBiobank}}",
-    "phq2": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&identifier={{config.PHQ2}}&_sort=-authored",
-    "who5": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&identifier={{config.WHO5}}&_sort=-authored",
+    "phq2": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&questionnaire={{config.PHQ2}}&_sort=-authored",
+    "who5": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&questionnaire=WHO5&_sort=-authored",
     "hdi4": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&identifier={{config.HDI4}}&_sort=-authored",
-    "share": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&identifier={{config.SHARE}}&_sort=-authored",
+    "share": "QuestionnaireResponse?patient=Patient/{{context.patientId}}&questionnaire={{config.SHARE}}&_sort=-authored",
     "bmi": "Observation?patient=Patient/{{context.patientId}}&code={{config.BMI}}&category=vital-signs&_sort=-date",
     "weight": "Observation?patient=Patient/{{context.patientId}}&code={{config.Weight}}&category=vital-signs&_sort=-date",
     "height": "Observation?patient=Patient/{{context.patientId}}&code={{config.Height}}&category=vital-signs&_sort=-date",

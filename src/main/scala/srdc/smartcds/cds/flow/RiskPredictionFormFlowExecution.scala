@@ -24,7 +24,18 @@ object RiskPredictionFormFlowExecution {
   implicit val formats: DefaultFormats.type = DefaultFormats
 
   private def getAnswersCodes(qr: QuestionnaireResponse, linkId: String): Option[Array[String]] = {
-    qr.item.getOrElse(Array.empty).find(item => item.linkId == linkId).flatMap(_.answer map { answers =>
+
+    def findItem(items: Array[Item]): Option[Item] = {
+      items.find(_.linkId == linkId)
+        .orElse {
+          items.view
+            .flatMap(item => item.item.getOrElse(Array.empty))
+            .flatMap(child => findItem(Array(child)))
+            .headOption
+        }
+    }
+
+    findItem(qr.item.getOrElse(Array.empty)).flatMap(_.answer.map { answers =>
       answers.flatMap(_.valueCoding.map(_.code))
     })
   }
