@@ -28,7 +28,7 @@ object RiskPredictionUtil {
     }
 
     Map(
-      "Age 0.0" -> getInteger(AGE),
+      "Age 0.0" -> getDecimal(AGE),
 //      "BMI 0.0" -> getDecimal(BMI),
       "C-reactive protein 0.0" -> getDecimal(CRP),
       "Cholesterol 0.0" -> getDecimal(CHOLESTEROL),
@@ -38,8 +38,8 @@ object RiskPredictionUtil {
       "Gamma glutamyltransferase 0.0" -> getDecimal(GAMMA_GLUTAMYLTRANSFERASE),
       "Getting up 0.0_num" -> getCode(GETTING_UP),
       "HbA1c 0.0" -> getDecimal(HBA1C),
-      "IMD Employment score 0.0" -> getCode(IMD_EMPLOYMENT_SCORE),
-      "IMD Health score 0.0" -> getCode(IMD_HEALTH_SCORE),
+      "IMD Employment score 0.0" -> getDecimal(IMD_EMPLOYMENT_SCORE),
+      "IMD Health score 0.0" -> getDecimal(IMD_HEALTH_SCORE),
       "LDL direct 0.0" -> getDecimal(LDL),
       "Sleep duration 0.0" -> getDecimal(SLEEP),
       "Systolic blood pressure 0.0" -> getDecimal(SYSTOLIC_BLOOD_PRESSURE),
