@@ -185,7 +185,15 @@ object RiskPredictionFormFlowExecution {
       observationValue(bmi.get)
     } else if (weight.nonEmpty && height.nonEmpty) {
       (observationValue(weight.get), observationValue(height.get)) match {
-        case (w, h) if w.nonEmpty && h.nonEmpty => Some(w.get / Math.pow(h.get, 2))
+        case (w, h) if w.nonEmpty && h.nonEmpty =>
+          val heightUnit =
+            height.get.valueQuantity.flatMap(_.unit).getOrElse("")
+
+          val heightInMeters =
+            if (heightUnit == "cm") h.get / 100.0
+            else h.get
+
+          Some(w.get / Math.pow(heightInMeters, 2))
         case _ => None
       }
     } else None
