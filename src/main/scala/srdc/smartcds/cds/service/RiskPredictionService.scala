@@ -6,7 +6,7 @@ import io.onfhir.cds.service.{BaseCdsService, CdsServiceContext, CdsServiceReque
 import org.json4s.DefaultFormats
 import srdc.smartcds.cds.flow.RiskPredictionFlowExecution
 import srdc.smartcds.model.fhir.QuestionnaireResponse
-import srdc.smartcds.util.RiskPredictionUtil
+import srdc.smartcds.util.{CdsPrefetchUtil, RiskPredictionUtil}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -32,7 +32,19 @@ class RiskPredictionService(cdsServiceContext: CdsServiceContext)
       try {
           // CALCULATION MODE: Delegate to flow
           println("[MODE] Calculation mode - delegating to flow")
-          val answers = RiskPredictionUtil.mapQrToFeatures(cdsServiceRequest.getReadPrefetch("qr").extract[QuestionnaireResponse])
+          val qrAnswers =
+            RiskPredictionUtil.mapQrToFeatures(
+              cdsServiceRequest.getReadPrefetch("qr").extract[QuestionnaireResponse]
+            )
+
+          val genderFeature =
+            fhirPathEvaluator
+              .evaluateString(CdsPrefetchUtil.GENDER_PATH, org.json4s.JNothing)
+              .headOption
+              .map(gender => Map("Gender" -> Some(gender)))
+              .getOrElse(Map.empty)
+
+          val answers = qrAnswers ++ genderFeature
 
           println(s"[MODE] Extracted ${answers.size} answers")
 
