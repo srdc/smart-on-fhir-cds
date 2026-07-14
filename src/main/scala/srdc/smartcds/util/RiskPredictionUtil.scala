@@ -22,10 +22,28 @@ object RiskPredictionUtil {
     def matchesCode(code: String, truthfulCodes: String*) =
       if (truthfulCodes.contains(code)) Some(1) else if (code == "-3") None else Some(0)
 
+    def getCodes(key: String): Seq[String] =
+      items
+        .get(key)
+        .flatten
+        .map(
+          answers =>
+            answers.toSeq.flatMap(answer => answer.valueCoding.map(_.code))
+        )
+        .getOrElse(Seq.empty[String])
+
+    def matchesAnyCode(codes: Seq[String], truthfulCodes: String*): Option[Int] =
+      if (codes.isEmpty) None
+      else if (codes.exists(truthfulCodes.contains)) Some(1)
+      else if (codes.contains("-3")) None
+      else Some(0)
+
     val waistHipRatio = (getDecimal(WAIST_CIRCUMFERENCE), getDecimal(HIP_CIRCUMFERENCE)) match {
       case (w, h) if w.nonEmpty && h.nonEmpty => Some(w.get/h.get)
       case _ => None
     }
+
+    val dentalProblemCodes = getCodes(DENTAL_PROBLEMS)
 
     Map(
       "Age 0.0" -> getDecimal(AGE),
@@ -48,7 +66,7 @@ object RiskPredictionUtil {
       "Sleeplessness 0.0_ord" -> getCode(INSOMNIA),
       "Accomodation own/rent 0.0_recoded_Renter" -> getCode(ACCOMMODATION).flatMap(matchesCode(_, "3", "4")),
       "Coffee type 0.0_Ground coffee (include espresso, filter etc)" -> getCode(COFFEE_TYPE).flatMap(matchesCode(_, "3")),
-      "Dental problems0 0.0_Dentures" -> getCode(DENTAL_PROBLEMS).flatMap(matchesCode(_, "6")),
+      "Dental problems0 0.0_Dentures" -> matchesAnyCode(dentalProblemCodes, "6"),
       "Drinker status 0.0_Previous" -> getCode(ALCOHOL_DRINKER_STATUS).flatMap(matchesCode(_, "1")),
       "Employment0 0.0_recoded_Employed" -> getCode(EMPLOYMENT).flatMap(matchesCode(_, "1")),
 //      "Employment0 0.0_recoded_Other" -> (if (getCode(EMPLOYMENT).contains("?")) 1 else 0), // NO OTHER OPTION
@@ -73,7 +91,7 @@ object RiskPredictionUtil {
       "Mother illnesses1 0.1_None of the above (group 1)" -> getCode(MOTHER_ILLNESS_1).flatMap(matchesCode(_, "-17")),
       "High light scatter reticulocyte pct 0.0" -> getDecimal(HIGH_LIGHT_SCATTER_RETICULOCYTE_PCT),
       "Waist-to-hip ratio 0.0" -> waistHipRatio,
-      "Dental problems0 0.0_None of the above" -> getCode(DENTAL_PROBLEMS).flatMap(matchesCode(_, "-7")),
+      "Dental problems0 0.0_None of the above" -> matchesAnyCode(dentalProblemCodes, "-7"),
     )
   }
 
