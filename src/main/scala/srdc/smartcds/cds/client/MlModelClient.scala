@@ -160,7 +160,7 @@ object MLModelClient {
 
     val httpRequest = HttpRequest(
       method = HttpMethods.POST,
-      uri = s"$mlServiceUrl/models/clinical_xgboost/plots/local",
+      uri = s"$mlServiceUrl/stage/plots/local",
       entity = HttpEntity(
         ContentTypes.`application/json`,
         requestJson
