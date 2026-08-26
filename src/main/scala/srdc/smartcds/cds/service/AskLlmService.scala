@@ -54,12 +54,17 @@ class AskLlmService(cdsServiceContext: CdsServiceContext) extends BaseCdsService
 
     structuredQuestion += question
 
-    LLMClient.ask(sessionId.get, structuredQuestion) map { response =>
-      val withCard = responseBuilder.withCard(_.loadCardWithPostTranslation("card-llm-response",
-        "text" -> response.text.replaceAll("\n", "\\\\n"),
-        "sessionId" -> response.session_id,
-        "suggestedQuestions" -> toCdsHooksSuggestions(response.suggested_questions)
-      ))
+    LLMClient.ask(sessionId.get, question.get) map { response =>
+      val withCard = responseBuilder.withCard(
+        _.loadCardWithPostTranslation(
+          "card-llm-response",
+          "text" -> response.text.replaceAll("\n", "\\\\n"),
+          "sessionId" -> response.session_id,
+          "suggestedQuestions" -> toCdsHooksSuggestions(
+            response.suggested_questions
+          )
+        )
+      )
       withCard.cdsResponse
     }
 
