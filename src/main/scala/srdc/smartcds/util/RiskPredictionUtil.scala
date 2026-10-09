@@ -17,19 +17,148 @@ object RiskPredictionUtil {
   def mapQrToFeatures(qr: QuestionnaireResponse) = {
     val items = qr.item.get.flatMap(_.item).flatMap(_.toSeq).map(item => item.linkId -> item.answer).toMap
     def getInteger(key: String) = items.get(key).flatMap(_.flatMap(_.headOption.flatMap(_.valueInteger)))
-    def getDecimal(key: String) = items.get(key).flatMap(_.flatMap(_.headOption.flatMap(_.valueDecimal)))
+    def getDecimal(key: String): Option[Double] =
+      items.get(key).flatMap(
+        _.flatMap(
+          _.headOption.flatMap { answer =>
+            answer.valueDecimal
+              .map(_.toDouble)
+              .orElse(answer.valueInteger.map(_.toDouble))
+          }
+        )
+      )
     def getCode(key: String) = items.get(key).flatMap(_.flatMap(_.headOption.flatMap(_.valueCoding.map(_.code))))
+    def mapCategoricalCode(
+      key: String,
+      feature: String,
+      codeMap: Map[String, String]
+    ): Option[String] =
+      getCode(key).map { code =>
+        codeMap.getOrElse(
+          code,
+          throw new IllegalArgumentException(
+            s"Unsupported Questionnaire code '$code' for feature '$feature'"
+          )
+        )
+      }
+
     def matchesCode(code: String, truthfulCodes: String*) =
       if (truthfulCodes.contains(code)) Some(1) else if (code == "-3") None else Some(0)
+
+    def getCodes(key: String): Seq[String] =
+      items
+        .get(key)
+        .flatten
+        .map(
+          answers =>
+            answers.toSeq.flatMap(answer => answer.valueCoding.map(_.code))
+        )
+        .getOrElse(Seq.empty[String])
+
+    def matchesAnyCode(codes: Seq[String], truthfulCodes: String*): Option[Int] =
+      if (codes.isEmpty) None
+      else if (codes.exists(truthfulCodes.contains)) Some(1)
+      else if (codes.contains("-3")) None
+      else Some(0)
+
+    val mentalYesNoMap = Map(
+      "1" -> "Yes",
+      "2" -> "No",
+      "-1" -> "Unknown",
+      "-3" -> "Unknown"
+    )
+
+    val accommodationMap = Map(
+      "1" -> "Owner",
+      "2" -> "Owner",
+      "3" -> "Renter",
+      "4" -> "Renter",
+      "5" -> "Owner",
+      "6" -> "Other",
+      "-7" -> "Other",
+      "-3" -> "Unknown"
+    )
+
+    val coffeeTypeMap = Map(
+      "1" -> "Decaffeinated coffee (any type)",
+      "2" -> "Instant coffee",
+      "3" -> "Ground coffee (include espresso, filter etc)",
+      "4" -> "Other type of coffee",
+      "-1" -> "Unknown",
+      "-3" -> "Unknown"
+    )
+
+    val employmentMap = Map(
+      "1" -> "Employed",
+      "2" -> "Retired",
+      "3" -> "Other",
+      "4" -> "Disabled",
+      "5" -> "Unemployed",
+      "6" -> "Other",
+      "7" -> "Student",
+      "-7" -> "Other",
+      "-3" -> "Other"
+    )
+
+    val fracturedBonesMap = Map(
+      "1" -> "Yes",
+      "0" -> "No",
+      "-1" -> "Unknown",
+      "-3" -> "Unknown"
+    )
+
+    val hearingDifficultyMap = Map(
+      "1" -> "Yes",
+      "0" -> "No",
+      "99" -> "Yes",
+      "-1" -> "Unknown",
+      "-3" -> "Unknown"
+    )
+
+    val qualificationMap = Map(
+      "1" -> "Degree",
+      "2" -> "Secondary",
+      "3" -> "Secondary",
+      "4" -> "Secondary",
+      "5" -> "Vocational",
+      "6" -> "Vocational",
+      "-7" -> "No qualifications",
+      "-3" -> "Other"
+    )
+
+    val smokingStatusMap = Map(
+      "0" -> "Never",
+      "1" -> "Previous",
+      "2" -> "Current",
+      "-3" -> "Unknown"
+    )
+
+    val tobaccoSmokingMap = Map(
+      "0" -> "No",
+      "1" -> "Yes, on most or all days",
+      "2" -> "Only occasionally",
+      "-3" -> "Unknown"
+    )
+
+    val drinkerStatusMap = Map(
+      "0" -> "Never",
+      "1" -> "Previous",
+      "2" -> "Current",
+      "-3" -> "Unknown"
+    )
 
     val waistHipRatio = (getDecimal(WAIST_CIRCUMFERENCE), getDecimal(HIP_CIRCUMFERENCE)) match {
       case (w, h) if w.nonEmpty && h.nonEmpty => Some(w.get/h.get)
       case _ => None
     }
 
+    val dentalProblemCodes = getCodes(DENTAL_PROBLEMS)
+
     Map(
       "Age 0.0" -> getDecimal(AGE),
-//      "BMI 0.0" -> getDecimal(BMI),
+      "BMI 0.0" -> getDecimal(BMI),
+      "Weight 0.0" -> getDecimal(WEIGHT),
+      "Standing height 0.0" -> getDecimal(HEIGHT),
       "C-reactive protein 0.0" -> getDecimal(CRP),
       "Cholesterol 0.0" -> getDecimal(CHOLESTEROL),
       "Cystatin C 0.0" -> getDecimal(CYSTATIN_C),
@@ -44,36 +173,132 @@ object RiskPredictionUtil {
       "Sleep duration 0.0" -> getDecimal(SLEEP),
       "Systolic blood pressure 0.0" -> getDecimal(SYSTOLIC_BLOOD_PRESSURE),
       "Waist circumference 0.0" -> getDecimal(WAIST_CIRCUMFERENCE),
+      "Hip circumference 0.0" -> getDecimal(HIP_CIRCUMFERENCE),
       "Day nap 0.0_ord" -> getCode(NAP),
       "Sleeplessness 0.0_ord" -> getCode(INSOMNIA),
-      "Accomodation own/rent 0.0_recoded_Renter" -> getCode(ACCOMMODATION).flatMap(matchesCode(_, "3", "4")),
-      "Coffee type 0.0_Ground coffee (include espresso, filter etc)" -> getCode(COFFEE_TYPE).flatMap(matchesCode(_, "3")),
-      "Dental problems0 0.0_Dentures" -> getCode(DENTAL_PROBLEMS).flatMap(matchesCode(_, "6")),
-      "Drinker status 0.0_Previous" -> getCode(ALCOHOL_DRINKER_STATUS).flatMap(matchesCode(_, "1")),
-      "Employment0 0.0_recoded_Employed" -> getCode(EMPLOYMENT).flatMap(matchesCode(_, "1")),
-//      "Employment0 0.0_recoded_Other" -> (if (getCode(EMPLOYMENT).contains("?")) 1 else 0), // NO OTHER OPTION
-      "Fed-up feelings 0.0_Yes" -> getCode(FED_UP_FEELINGS).flatMap(matchesCode(_, "1")),
-      "Fractured bones 0.0_Yes" -> getCode(FRACTURED_BONES).flatMap(matchesCode(_, "1")),
-      "Hearing difficulty 0.0_No" -> getCode(HEARING_DIFFICULTY).flatMap(matchesCode(_, "0")),
-      "Loneliness 0.0_Yes" -> getCode(LONELINESS).flatMap(matchesCode(_, "1")),
-      "Miserableness 0.0_Yes" -> getCode(MISERABLENESS).flatMap(matchesCode(_, "1")),
-      "Mood swings 0.0_Yes" -> getCode(MOOD_SWING).flatMap(matchesCode(_, "1")),
+      "Dental problems0 0.0_Dentures" -> matchesAnyCode(dentalProblemCodes, "6"),
       "Mother illnesses1 0.1_None of the above (group 2)" -> getCode(MOTHER_ILLNESS_2).flatMap(matchesCode(_, "-27")),
-      "Nerves 0.0_Yes" -> getCode(NERVES).flatMap(matchesCode(_, "1")),
       "Pain0 0.0_None of the above" -> getCode(PAIN).flatMap(matchesCode(_, "-7")),
       "Pain0 0.0_Pain all over the body" -> getCode(PAIN).flatMap(matchesCode(_, "8")),
-      "Qualification0 0.0_recoded_None" -> getCode(QUALIFICATION).flatMap(matchesCode(_, "-7")),
-      "Sensitivity 0.0_Yes" -> getCode(SENSITIVITY).flatMap(matchesCode(_, "1")),
       "Sibling illnesses0 0.0_None of the above (group 1)" -> getCode(SIBLING_ILLNESS_1).flatMap(matchesCode(_, "-17")),
-      "Smoking status 0.0_Never" -> getCode(SMOKING_STATUS).flatMap(matchesCode(_, "0")),
-      "Tobacco smoking 0.0_Yes, on most or all days" -> getCode(TOBACCO_SMOKING).flatMap(matchesCode(_, "1")),
-      "Worrier feelings 0.0_Yes" -> getCode(WORRIER_FEELINGS).flatMap(matchesCode(_, "1")),
       "Body fat % 0.0" -> getDecimal(BODY_FAT_PERCENTAGE),
-      "Accomodation own/rent 0.0_recoded_Owner" -> getCode(ACCOMMODATION).flatMap(matchesCode(_, "1", "2")),
       "Mother illnesses1 0.1_None of the above (group 1)" -> getCode(MOTHER_ILLNESS_1).flatMap(matchesCode(_, "-17")),
       "High light scatter reticulocyte pct 0.0" -> getDecimal(HIGH_LIGHT_SCATTER_RETICULOCYTE_PCT),
       "Waist-to-hip ratio 0.0" -> waistHipRatio,
-      "Dental problems0 0.0_None of the above" -> getCode(DENTAL_PROBLEMS).flatMap(matchesCode(_, "-7")),
+      "Dental problems0 0.0_None of the above" -> matchesAnyCode(dentalProblemCodes, "-7"),
+      "Accommodation own/rent_recoded" ->
+        mapCategoricalCode(
+          ACCOMMODATION,
+          "Accommodation own/rent_recoded",
+          accommodationMap
+        ),
+
+      "Coffee type 0.0" ->
+        mapCategoricalCode(
+          COFFEE_TYPE,
+          "Coffee type 0.0",
+          coffeeTypeMap
+        ),
+
+      "Drinker status 0.0" ->
+        mapCategoricalCode(
+          ALCOHOL_DRINKER_STATUS,
+          "Drinker status 0.0",
+          drinkerStatusMap
+        ),
+
+      "Employment_recoded" ->
+        mapCategoricalCode(
+          EMPLOYMENT,
+          "Employment_recoded",
+          employmentMap
+        ),
+
+      "Fed-up feelings 0.0" ->
+        mapCategoricalCode(
+          FED_UP_FEELINGS,
+          "Fed-up feelings 0.0",
+          mentalYesNoMap
+        ),
+
+      "Fractured bones 0.0" ->
+        mapCategoricalCode(
+          FRACTURED_BONES,
+          "Fractured bones 0.0",
+          fracturedBonesMap
+        ),
+
+      "Hearing difficulty 0.0" ->
+        mapCategoricalCode(
+          HEARING_DIFFICULTY,
+          "Hearing difficulty 0.0",
+          hearingDifficultyMap
+        ),
+
+      "Loneliness 0.0" ->
+        mapCategoricalCode(
+          LONELINESS,
+          "Loneliness 0.0",
+          mentalYesNoMap
+        ),
+
+      "Miserableness 0.0" ->
+        mapCategoricalCode(
+          MISERABLENESS,
+          "Miserableness 0.0",
+          mentalYesNoMap
+        ),
+
+      "Mood swings 0.0" ->
+        mapCategoricalCode(
+          MOOD_SWING,
+          "Mood swings 0.0",
+          mentalYesNoMap
+        ),
+
+      "Nerves 0.0" ->
+        mapCategoricalCode(
+          NERVES,
+          "Nerves 0.0",
+          mentalYesNoMap
+        ),
+
+      "Qualification_recoded" ->
+        mapCategoricalCode(
+          QUALIFICATION,
+          "Qualification_recoded",
+          qualificationMap
+        ),
+
+      "Sensitivity 0.0" ->
+        mapCategoricalCode(
+          SENSITIVITY,
+          "Sensitivity 0.0",
+          mentalYesNoMap
+        ),
+
+      "Smoking status 0.0" ->
+        mapCategoricalCode(
+          SMOKING_STATUS,
+          "Smoking status 0.0",
+          smokingStatusMap
+        ),
+
+      "Tobacco smoking 0.0" ->
+        mapCategoricalCode(
+          TOBACCO_SMOKING,
+          "Tobacco smoking 0.0",
+          tobaccoSmokingMap
+        ),
+
+      "Worrier feelings 0.0" ->
+        mapCategoricalCode(
+          WORRIER_FEELINGS,
+          "Worrier feelings 0.0",
+          mentalYesNoMap
+        ),
+
+
     )
   }
 

@@ -74,9 +74,9 @@ object QuestionnaireResponseUtil {
   }
 
   /**
-   * - linkId = UK Biobank code directly (not "ukb-{code}")
-   * - Answer includes BOTH valueCoding AND actual value (valueDecimal/valueInteger)
-   */
+  * - linkId = UK Biobank code directly
+  * - Numeric answers preserve valueQuantity as valueDecimal
+  */
   private def createItem(ukbCode: String, observation: Observation): Option[Item] = {
     val answer = createAnswer(ukbCode, observation)
 
@@ -108,15 +108,21 @@ object QuestionnaireResponseUtil {
       display = Some(getDisplayText(ukbCode)),
     )
 
-    // valueQuantity -> Include BOTH valueDecimal AND valueInteger
-    if (observation.valueQuantity.isDefined && observation.valueQuantity.get.value.isDefined) {
-      val actualValue = observation.valueQuantity.get.value.get
-      return Some(Answer(
-        valueCoding = Some(ukbCoding),           // UK Biobank code
-        valueInteger = Some(actualValue.round.toInt),  // Rounded for integer fields
-      ))
-    }
+    // Preserve valueQuantity precision in this generic prefill path.
+    // Unit conversion is handled by the calling flow when required.
+    if (
+      observation.valueQuantity.isDefined &&
+      observation.valueQuantity.get.value.isDefined
+    ) {
+      val actualValue =
+        observation.valueQuantity.get.value.get
 
+      return Some(
+        Answer(
+          valueDecimal = Some(actualValue)
+        )
+      )
+    }
 
     // valueBoolean -> Convert to integer (1/0)
     if (observation.valueBoolean.isDefined) {
