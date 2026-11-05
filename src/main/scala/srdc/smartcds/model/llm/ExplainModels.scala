@@ -18,7 +18,10 @@ case class Explanation(
                       what_increases_prediction: Option[List[String]],
                       what_decreases_prediction: Option[List[String]],
                       what_this_does_not_mean: Option[String],
-                      confidence_and_caveats: Option[List[String]]
+                      confidence_and_caveats: Option[List[String]],
+                      // beeswarm (global) explanations come with these instead of what_increases/decreases_prediction
+                      most_important_features: Option[List[String]] = None,
+                      directional_patterns: Option[List[String]] = None
                       )
 
 case class ExplainResponse(

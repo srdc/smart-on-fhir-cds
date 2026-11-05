@@ -67,6 +67,8 @@ class ShapExplainService(cdsServiceContext: CdsServiceContext) extends BaseCdsSe
           explanation.what_decreases_prediction.map(value => ("label" -> Serialization.write(value)) ~ ("uuid" -> "decreasing-factors")),
           explanation.confidence_and_caveats.map(value => ("label" -> Serialization.write(value)) ~ ("uuid" -> "confidence")),
           explanation.what_this_does_not_mean.map(value => ("label" -> value) ~ ("uuid" -> "what-does-not-mean")),
+          explanation.most_important_features.map(value => ("label" -> Serialization.write(value)) ~ ("uuid" -> "important-features")),
+          explanation.directional_patterns.map(value => ("label" -> Serialization.write(value)) ~ ("uuid" -> "directional-patterns")),
         ).filter(_.nonEmpty).map(_.get)
       }).getOrElse(List.empty)
     ).toJson
