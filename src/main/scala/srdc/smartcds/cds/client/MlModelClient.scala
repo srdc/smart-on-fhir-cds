@@ -7,6 +7,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
+import srdc.smartcds.config.SmartCdsConfig
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -122,7 +123,8 @@ object MLModelClient {
   def getPredictionsWithPlots(
                       answers: Map[String, Option[Any]],
                       patientId: Option[String] = None,
-                      mlServiceUrl: String = "http://localhost:8001"
+                      mlServiceUrl: String = SmartCdsConfig.mlServiceUrl,
+                      diseases: Option[Seq[String]] = None
                     )(implicit system: ActorSystem, ec: ExecutionContext): Option[String] = {
 
     println(s"[ML Model] Calling ML service at $mlServiceUrl")
@@ -150,17 +152,19 @@ object MLModelClient {
 
     println(s"[ML Model] Extracted ${flatFeatures.size} features")
 
-    val requestBody = LocalPlotRequest(
-      features = flatFeatures,
-      patient_id = patientId
-    )
+    // Only the diseases the user selected (if any); otherwise the default list (the ML service ignores the
+    // ones the patient's stratum has no model for)
+    val requestBody = diseases.filter(_.nonEmpty) match {
+      case Some(selected) => LocalPlotRequest(features = flatFeatures, patient_id = patientId, diseases = selected)
+      case None => LocalPlotRequest(features = flatFeatures, patient_id = patientId)
+    }
 
     val requestJson = write(requestBody)
     println(s"[ML Model] Request JSON: $requestJson")
 
     val httpRequest = HttpRequest(
       method = HttpMethods.POST,
-      uri = s"$mlServiceUrl/models/clinical_xgboost/plots/local",
+      uri = s"$mlServiceUrl/stage/plots/local",
       entity = HttpEntity(
         ContentTypes.`application/json`,
         requestJson
@@ -170,7 +174,7 @@ object MLModelClient {
     try {
       println(s"[ML Model] Sending HTTP request...")
       val responseFuture: Future[HttpResponse] = Http().singleRequest(httpRequest)
-      val response = Await.result(responseFuture, 30.seconds)
+      val response = Await.result(responseFuture, SmartCdsConfig.mlServiceTimeout)
 
       println(s"[ML Model] Received response with status: ${response.status}")
 
@@ -198,7 +202,7 @@ object MLModelClient {
   def getPredictions(
                       answers: Map[String, Option[Any]],
                       patientId: Option[String] = None,
-                      mlServiceUrl: String = "http://localhost:8001",
+                      mlServiceUrl: String = SmartCdsConfig.mlServiceUrl,
                       includeShap: Boolean = true
                     )(implicit system: ActorSystem, ec: ExecutionContext): Option[PredictionResponse] = {
 
@@ -238,7 +242,7 @@ object MLModelClient {
 
     val httpRequest = HttpRequest(
       method = HttpMethods.POST,
-      uri = s"$mlServiceUrl/models/clinical_xgboost/predict",
+      uri = s"$mlServiceUrl/stage/predict",
       entity = HttpEntity(
         ContentTypes.`application/json`,
         requestJson
@@ -248,7 +252,7 @@ object MLModelClient {
     try {
       println(s"[ML Model] Sending HTTP request...")
       val responseFuture: Future[HttpResponse] = Http().singleRequest(httpRequest)
-      val response = Await.result(responseFuture, 30.seconds)
+      val response = Await.result(responseFuture, SmartCdsConfig.mlServiceTimeout)
 
       println(s"[ML Model] Received response with status: ${response.status}")
 
@@ -447,7 +451,7 @@ object MLModelClient {
   /**
    * Check ML service health
    */
-  def checkHealth(mlServiceUrl: String = "http://localhost:8001")
+  def checkHealth(mlServiceUrl: String = SmartCdsConfig.mlServiceUrl)
                  (implicit system: ActorSystem, ec: ExecutionContext): Boolean = {
     val httpRequest = HttpRequest(
       method = HttpMethods.GET,
@@ -478,7 +482,7 @@ object MLModelClient {
   /**
    * Get list of all diseases the model can predict
    */
-  def getDiseases(mlServiceUrl: String = "http://localhost:8001")
+  def getDiseases(mlServiceUrl: String = SmartCdsConfig.mlServiceUrl)
                  (implicit system: ActorSystem, ec: ExecutionContext): Option[List[String]] = {
     val httpRequest = HttpRequest(
       method = HttpMethods.GET,

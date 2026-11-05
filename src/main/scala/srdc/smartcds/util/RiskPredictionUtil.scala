@@ -9,73 +9,39 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import srdc.smartcds.cds.client.MLModelClient
 import srdc.smartcds.config.LlmConfig
-import srdc.smartcds.model.fhir.QuestionnaireResponse
-import srdc.smartcds.model.UKBiobankFeatures._
+import srdc.smartcds.model.fhir.{Answer, QuestionnaireResponse}
 
 object RiskPredictionUtil {
 
-  def mapQrToFeatures(qr: QuestionnaireResponse) = {
-    val items = qr.item.get.flatMap(_.item).flatMap(_.toSeq).map(item => item.linkId -> item.answer).toMap
-    def getInteger(key: String) = items.get(key).flatMap(_.flatMap(_.headOption.flatMap(_.valueInteger)))
-    def getDecimal(key: String) = items.get(key).flatMap(_.flatMap(_.headOption.flatMap(_.valueDecimal)))
-    def getCode(key: String) = items.get(key).flatMap(_.flatMap(_.headOption.flatMap(_.valueCoding.map(_.code))))
-    def matchesCode(code: String, truthfulCodes: String*) =
-      if (truthfulCodes.contains(code)) Some(1) else if (code == "-3") None else Some(0)
-
-    val waistHipRatio = (getDecimal(WAIST_CIRCUMFERENCE), getDecimal(HIP_CIRCUMFERENCE)) match {
-      case (w, h) if w.nonEmpty && h.nonEmpty => Some(w.get/h.get)
-      case _ => None
-    }
-
-    Map(
-      "Age 0.0" -> getInteger(AGE),
-//      "BMI 0.0" -> getDecimal(BMI),
-      "C-reactive protein 0.0" -> getDecimal(CRP),
-      "Cholesterol 0.0" -> getDecimal(CHOLESTEROL),
-      "Cystatin C 0.0" -> getDecimal(CYSTATIN_C),
-      "Diastolic blood pressure 0.0" -> getDecimal(DIASTOLIC_BLOOD_PRESSURE),
-//      "Diastolic blood pressure 0.1" -> ,
-      "Gamma glutamyltransferase 0.0" -> getDecimal(GAMMA_GLUTAMYLTRANSFERASE),
-      "Getting up 0.0_num" -> getCode(GETTING_UP),
-      "HbA1c 0.0" -> getDecimal(HBA1C),
-      "IMD Employment score 0.0" -> getCode(IMD_EMPLOYMENT_SCORE),
-      "IMD Health score 0.0" -> getCode(IMD_HEALTH_SCORE),
-      "LDL direct 0.0" -> getDecimal(LDL),
-      "Sleep duration 0.0" -> getDecimal(SLEEP),
-      "Systolic blood pressure 0.0" -> getDecimal(SYSTOLIC_BLOOD_PRESSURE),
-      "Waist circumference 0.0" -> getDecimal(WAIST_CIRCUMFERENCE),
-      "Day nap 0.0_ord" -> getCode(NAP),
-      "Sleeplessness 0.0_ord" -> getCode(INSOMNIA),
-      "Accomodation own/rent 0.0_recoded_Renter" -> getCode(ACCOMMODATION).flatMap(matchesCode(_, "3", "4")),
-      "Coffee type 0.0_Ground coffee (include espresso, filter etc)" -> getCode(COFFEE_TYPE).flatMap(matchesCode(_, "3")),
-      "Dental problems0 0.0_Dentures" -> getCode(DENTAL_PROBLEMS).flatMap(matchesCode(_, "6")),
-      "Drinker status 0.0_Previous" -> getCode(ALCOHOL_DRINKER_STATUS).flatMap(matchesCode(_, "1")),
-      "Employment0 0.0_recoded_Employed" -> getCode(EMPLOYMENT).flatMap(matchesCode(_, "1")),
-//      "Employment0 0.0_recoded_Other" -> (if (getCode(EMPLOYMENT).contains("?")) 1 else 0), // NO OTHER OPTION
-      "Fed-up feelings 0.0_Yes" -> getCode(FED_UP_FEELINGS).flatMap(matchesCode(_, "1")),
-      "Fractured bones 0.0_Yes" -> getCode(FRACTURED_BONES).flatMap(matchesCode(_, "1")),
-      "Hearing difficulty 0.0_No" -> getCode(HEARING_DIFFICULTY).flatMap(matchesCode(_, "0")),
-      "Loneliness 0.0_Yes" -> getCode(LONELINESS).flatMap(matchesCode(_, "1")),
-      "Miserableness 0.0_Yes" -> getCode(MISERABLENESS).flatMap(matchesCode(_, "1")),
-      "Mood swings 0.0_Yes" -> getCode(MOOD_SWING).flatMap(matchesCode(_, "1")),
-      "Mother illnesses1 0.1_None of the above (group 2)" -> getCode(MOTHER_ILLNESS_2).flatMap(matchesCode(_, "-27")),
-      "Nerves 0.0_Yes" -> getCode(NERVES).flatMap(matchesCode(_, "1")),
-      "Pain0 0.0_None of the above" -> getCode(PAIN).flatMap(matchesCode(_, "-7")),
-      "Pain0 0.0_Pain all over the body" -> getCode(PAIN).flatMap(matchesCode(_, "8")),
-      "Qualification0 0.0_recoded_None" -> getCode(QUALIFICATION).flatMap(matchesCode(_, "-7")),
-      "Sensitivity 0.0_Yes" -> getCode(SENSITIVITY).flatMap(matchesCode(_, "1")),
-      "Sibling illnesses0 0.0_None of the above (group 1)" -> getCode(SIBLING_ILLNESS_1).flatMap(matchesCode(_, "-17")),
-      "Smoking status 0.0_Never" -> getCode(SMOKING_STATUS).flatMap(matchesCode(_, "0")),
-      "Tobacco smoking 0.0_Yes, on most or all days" -> getCode(TOBACCO_SMOKING).flatMap(matchesCode(_, "1")),
-      "Worrier feelings 0.0_Yes" -> getCode(WORRIER_FEELINGS).flatMap(matchesCode(_, "1")),
-      "Body fat % 0.0" -> getDecimal(BODY_FAT_PERCENTAGE),
-      "Accomodation own/rent 0.0_recoded_Owner" -> getCode(ACCOMMODATION).flatMap(matchesCode(_, "1", "2")),
-      "Mother illnesses1 0.1_None of the above (group 1)" -> getCode(MOTHER_ILLNESS_1).flatMap(matchesCode(_, "-17")),
-      "High light scatter reticulocyte pct 0.0" -> getDecimal(HIGH_LIGHT_SCATTER_RETICULOCYTE_PCT),
-      "Waist-to-hip ratio 0.0" -> waistHipRatio,
-      "Dental problems0 0.0_None of the above" -> getCode(DENTAL_PROBLEMS).flatMap(matchesCode(_, "-7")),
-    )
+  /**
+   * Builds the ML server request inputs from the QuestionnaireResponse that onfhir-feast's
+   * `stage_wp6_model_features` FeatureSet returns (via `$retrieve-feature-values&format=fhir`).
+   *
+   * The FeatureSet's outputName (= the linkId of every item in that response) is the UK Biobank field code, and
+   * the ML server accepts UK Biobank codes directly as feature names, so no feature-name mapping or per-feature
+   * logic lives here: every answered item becomes `UKBB code -> value`. All transformations (mappings,
+   * aggregations, 'Yes'/'Unknown' conversions, ...) are defined in the feature mapping Excel and generated into
+   * the FeatureSet definitions.
+   *
+   * The response groups features under synthetic parent item(s), so this descends one level, falling back to
+   * the top-level item itself when it has no nested `item` array. Items without an answer are left out
+   * (the ML model tolerates missing features). Only the first answer of an item is used.
+   */
+  def extractModelInputs(qr: QuestionnaireResponse): Map[String, Option[Any]] = {
+    val leafItems = qr.item.getOrElse(Array()).flatMap(top => top.item.getOrElse(Array(top)))
+    leafItems.flatMap { item =>
+      item.answer.getOrElse(Array()).headOption.flatMap(answerValue).map(v => item.linkId -> (Some(v): Option[Any]))
+    }.toMap
   }
+
+  // Coded answers come back as either valueCoding (feature declares a valueSet) or valueString (it doesn't)
+  private def answerValue(a: Answer): Option[Any] =
+    a.valueDecimal
+      .orElse(a.valueInteger)
+      .orElse(a.valueBoolean)
+      .orElse(a.valueCoding.map(_.code))
+      .orElse(a.valueString)
+
 
 
 

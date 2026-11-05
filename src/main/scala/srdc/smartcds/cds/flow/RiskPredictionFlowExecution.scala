@@ -95,13 +95,14 @@ object RiskPredictionFlowExecution {
   def executeCalculationFlow(
                               answers: Map[String, Option[Any]],
                               responseBuilder: CdsResponseBuilder,
-                              patientId: Option[String] = None
+                              patientId: Option[String] = None,
+                              diseases: Option[Seq[String]] = None
                             )(implicit system: ActorSystem, ec: ExecutionContext): CdsResponseBuilder = {
 
     println(" Starting calculation flow...")
     val pid = patientId.getOrElse("unknown")
 
-    MLModelClient.getPredictionsWithPlots(answers, Some(pid)) match {
+    MLModelClient.getPredictionsWithPlots(answers, Some(pid), diseases = diseases) match {
       case Some(prediction) =>
         println(s" Received predictions")
         createRiskCardsWithPlainResponse(prediction, responseBuilder, pid)
