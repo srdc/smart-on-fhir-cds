@@ -1,0 +1,38 @@
+{
+    "uuid": "interventions",
+    "summary": "Suggested interventions",
+    "indicator": "info",
+    "detail": "Personalized intervention suggestions to reduce disease risks",
+    "source": {
+        "label": "STAGE AI Risk Prediction Tool"
+    },
+    "suggestions": [
+        {{#interventions}}
+            {{^_first}},{{/_first}}{
+                "label": "{{label}}",
+                "uuid": "{{id}}",
+                "actions": [{
+                    "type": "create",
+                    "description": "{{description}}",
+                    "resource": {
+                        "resourceType": "Goal",
+                        "lifecycleStatus": "proposed",
+                        "description": { "text": "{{description}}" },
+                        "subject": {
+                            "reference": "Patient/{{context.patientId}}"
+                        }{{#target}},
+                        "target": [{
+                            "measure": {
+                                "coding": [{
+                                    "system": "{{system}}",
+                                    "code": "{{code}}"{{#display}},
+                                    "display": "{{display}}"{{/display}}
+                                }]
+                            }
+                        }]{{/target}}
+                    }
+                }]
+            }
+        {{/interventions}}
+    ]
+}

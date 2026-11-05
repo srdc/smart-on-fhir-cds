@@ -1,6 +1,6 @@
 package srdc.smartcds.cds
 
-import srdc.smartcds.cds.service.{ACCAHAService, AdvanceService, AskLlmService, DefinitionService, InMemorySearchService, QRisk3Service, QRiskService, RiskPredictionFormService, RiskPredictionService, Score2Service, ShapExplainService, SmartRiskService, ValueSetService}
+import srdc.smartcds.cds.service.{ACCAHAService, AdvanceService, AskLlmService, DefinitionService, InMemorySearchService, InterventionsService, QRisk3Service, QRiskService, RiskPredictionDiseasesService, RiskPredictionFormService, RiskPredictionService, Score2Service, ShapExplainService, SmartRiskService, ValueSetService}
 import io.onfhir.cds.service.{CdsServiceContext, ICdsService, ICdsServiceFactory}
 
 object CdsServiceFactory extends ICdsServiceFactory {
@@ -9,7 +9,7 @@ object CdsServiceFactory extends ICdsServiceFactory {
    * Service IDs implemented in the project
    */
   val servicesSupported: Set[String] = Set("qrisk", "definition", "score2", "smart", "qrisk3", "acc_aha", "advance",
-    "valueset", "in-memory-search", "risk_prediction", "shap_explain", "ask_llm", "risk_prediction_form")
+    "valueset", "in-memory-search", "risk_prediction", "shap_explain", "ask_llm", "risk_prediction_form", "risk_prediction_diseases", "interventions")
 
   /**
    * Checks if there is an implemented service with the given service ID
@@ -38,8 +38,10 @@ object CdsServiceFactory extends ICdsServiceFactory {
       case "in-memory-search" => new InMemorySearchService(cdsServiceContext)
       case "risk_prediction" => new RiskPredictionService(cdsServiceContext)
       case "risk_prediction_form" => new RiskPredictionFormService(cdsServiceContext)
+      case "risk_prediction_diseases" => new RiskPredictionDiseasesService(cdsServiceContext)
       case "shap_explain" => new ShapExplainService(cdsServiceContext)
       case "ask_llm" => new AskLlmService(cdsServiceContext)
+      case "interventions" => new InterventionsService(cdsServiceContext)
       case other => throw new Exception(s"Service $other not supported!")
     }
   }

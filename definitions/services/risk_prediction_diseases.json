@@ -1,0 +1,9 @@
+{
+  "hook": "execute",
+  "title": "Risk Prediction diseases service",
+  "description": "Lists the diseases a risk prediction can be calculated for (to let the user choose before calling risk_prediction)",
+  "id": "risk_prediction_diseases",
+  "prefetch": {
+    "patient": "Patient/{{context.patientId}}"
+  }
+}

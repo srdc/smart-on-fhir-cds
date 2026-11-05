@@ -1,0 +1,10 @@
+{
+  "hook": "execute",
+  "title": "Intervention suggestion service",
+  "description": "",
+  "id": "interventions",
+  "prefetch": {
+    "patient": "Patient/{{context.patientId}}",
+    "observations":  "Observation?subject=Patient/{{context.patientId}}"
+  }
+}

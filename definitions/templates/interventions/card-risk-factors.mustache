@@ -1,0 +1,17 @@
+{
+    "uuid": "modifiable-risk-factors",
+    "summary": "{{disease}}",
+    "indicator": "info",
+    "detail": "Modifiable risk factors related to {{disease}}",
+    "source": {
+        "label": "STAGE AI Risk Prediction Tool"
+    },
+    "suggestions": [
+        {{#riskFactors}}
+            {{^_first}},{{/_first}}{
+                "label": "{{label}}",
+                "uuid": "{{id}}"
+            }
+        {{/riskFactors}}
+    ]
+}
