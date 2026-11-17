@@ -1,3 +1,8 @@
+> [!WARNING]
+> **Deprecated: this project is no longer maintained.** The STAGE CDS Hooks services (QRISK, QRISK3, SCORE2, ACC/AHA,
+> ADVANCE, SMART, the risk prediction and LLM services) are now part of the STAGE FHIR repository and are served by it
+> under `<FHIR base>/cds-hooks`: [srdc/stage-fhir-repository](https://github.com/srdc/stage-fhir-repository).
+
 # SMART CDS
 
 _Example Clinical Decision Support services implemented using onfhir-cds library ([onFHIR.io](https://onfhir.io/))._
